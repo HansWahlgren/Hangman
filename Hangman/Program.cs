@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Collections.Generic;
 
 namespace Hangman
 {
@@ -6,12 +8,12 @@ namespace Hangman
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Hangman!");
-            Console.WriteLine("You have 10 chances to guess the word");
+            Console.WriteLine("\n\tWelcome to Hangman!");
+            Console.WriteLine("\tYou have 10 chances to guess the word");
             string secretWord = GetSecretWord();
-            System.Threading.Thread.Sleep(3000);
-            Console.Clear();
+            System.Threading.Thread.Sleep(1000);
             GameScreen(10, secretWord);
+            //!! Öka start up
         }
 
         static string GetSecretWord()
@@ -30,49 +32,112 @@ namespace Hangman
             {
                 secretLetters[i] = '_';
             }
-            // string wrongLetters = string.BUILDER
+            StringBuilder wrongLetters = new StringBuilder();
 
-            while(guessesLeft > 0)
+            while (guessesLeft > 0)
             {
-                // VISA PLATSER & BOKSTÄVER
-
-                Console.WriteLine($"You have {guessesLeft} guesses left");
-                Console.WriteLine("Guess a letter in the word or the word itself");
-                string userguess = Console.ReadLine();
-
-                if (userguess.Length < 2)
+                try
                 {
-                    char letterGuess = char.Parse(userguess);
-                    var result = CheckChar(letterGuess, secretWord);
+                    ShowUpdate(secretLetters, wrongLetters, guessesLeft);
+                    string userguess = Console.ReadLine();
+                    userguess = userguess.ToUpper();
+                    string secretUpperWord = secretWord.ToUpper();
 
-                    //RÄTT ELLER FEL CHAR, LÄTT TILL I STRING BUILD ELLER CHAR ARRAY
-                }
-
-                //ORDET RÄTT ELLER GAME OVER
-                else
-                {
-                    if (userguess == secretWord)
+                    if (userguess.Length == 1)
                     {
-                        EndGame(true);
+                        char letterGuess = char.Parse(userguess);
+                        bool letterExists = CheckDuplicate(letterGuess, secretLetters, wrongLetters);
+                        if (letterExists == false)
+                        {
+                            var result = CheckChar(letterGuess, secretUpperWord);
+                            if (result.Item1 == true)
+                            {
+                                for (int i = 0; i < result.Item2.Count; i++)
+                                {
+                                    secretLetters[result.Item2[i]] = letterGuess;
+                                }
+                            }
+                            else
+                            {
+                                guessesLeft--;
+                                wrongLetters.Append(letterGuess).Append("  ");
+                            }
+                        }
                     }
+
                     else
                     {
-                        Console.Clear();
-                        Console.WriteLine("That was not the word");
-                        guessesLeft--;
-                        System.Threading.Thread.Sleep(1500);
+                        if (userguess == secretUpperWord)
+                        {
+                            EndGame(true);
+                            break;
+                        }
+                        else
+                        {
+                            guessesLeft--;
+                        }
                     }
+                    if (Array.IndexOf(secretLetters, '_') == -1)
+                    {
+                        EndGame(true);
+                        break;
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("An exception has occurred, you maybe tried to input numbers or symbols instead of letters");
                 }
             }
             EndGame(false);
         }
 
-        static (char,bool) CheckChar(char userguess, string secretWord)
+        static void ShowUpdate(char[] secretLetters, StringBuilder wrongLetters,int guessesLeft)
         {
-            return ('T' , true);
+            Console.Clear();
+            Console.WriteLine($"\n\tYou have {guessesLeft} guesses left");
+            Console.WriteLine("\tGuess a letter in the word or the word itself");
+            Console.WriteLine();
+            for (int i = 0; i < secretLetters.Length; i++)
+            {
+                Console.Write($"\t{secretLetters[i]}");
+            }
+            Console.WriteLine("\n" + "\n");
+            Console.WriteLine($"\tLetters not in the word: \n\t{wrongLetters}\n");
+
+            //!!Visa hängd gubbe??
         }
 
-        //END OF GAME
+        static bool CheckDuplicate(char letterGuess, char[] secretLetters, StringBuilder wrongLetters)
+        {
+            if (wrongLetters.ToString().IndexOf(letterGuess) == -1 && Array.IndexOf(secretLetters, letterGuess) == -1)
+            {
+                return (false);
+            }
+            else
+            {
+                return (true);
+            }
+        }
+
+        static (bool, List<int>) CheckChar(char letterGuess, string secretWord)
+        {
+            List<int> indexPositions = new List<int>();
+            int i = 0;
+            while ((i = secretWord.IndexOf(letterGuess, i)) != -1)
+            {
+                indexPositions.Add(i);
+                i++;
+            }
+            if (indexPositions.Count > 0)
+            {
+                return (true, indexPositions);
+            }
+            else
+            {
+                return (false, indexPositions);
+            }
+        }
+
         static void EndGame(bool checkVictory)
         {
             Console.Clear();
@@ -84,10 +149,11 @@ namespace Hangman
             {
                 Console.WriteLine("You have lost the game!");
             }
-
-            System.Threading.Thread.Sleep(4000);
+            System.Threading.Thread.Sleep(2000);
             string secretWord = GetSecretWord();
             GameScreen(10, secretWord);
+            //!!Ändra tid
+            //!! Visa vinst / förlust + rätt ord (Hängd gubbe?)
         }
     }
 }
