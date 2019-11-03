@@ -11,9 +11,8 @@ namespace Hangman
             Console.WriteLine("\n\tWelcome to Hangman!");
             Console.WriteLine("\tYou have 10 chances to guess the word");
             string secretWord = GetSecretWord();
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(3000);
             GameScreen(10, secretWord);
-            //!! Öka start up
         }
 
         static string GetSecretWord()
@@ -42,39 +41,42 @@ namespace Hangman
                     string userguess = Console.ReadLine();
                     userguess = userguess.ToUpper();
                     string secretUpperWord = secretWord.ToUpper();
-
-                    if (userguess.Length == 1)
+                    bool isLetter = CheckIfLetter(userguess);
+                   
+                    if (userguess != "" && isLetter == true)
                     {
-                        char letterGuess = char.Parse(userguess);
-                        bool letterExists = CheckDuplicate(letterGuess, secretLetters, wrongLetters);
-                        if (letterExists == false)
+                        if (userguess.Length == 1)
                         {
-                            var result = CheckChar(letterGuess, secretUpperWord);
-                            if (result.Item1 == true)
+                            char letterGuess = char.Parse(userguess);
+                            bool letterExists = CheckDuplicate(letterGuess, secretLetters, wrongLetters);
+                            if (letterExists == false)
                             {
-                                for (int i = 0; i < result.Item2.Count; i++)
+                                var result = CheckChar(letterGuess, secretUpperWord);
+                                if (result.Item1 == true)
                                 {
-                                    secretLetters[result.Item2[i]] = letterGuess;
+                                    for (int i = 0; i < result.Item2.Count; i++)
+                                    {
+                                        secretLetters[result.Item2[i]] = letterGuess;
+                                    }
                                 }
+                                else
+                                {
+                                    guessesLeft--;
+                                    wrongLetters.Append(letterGuess).Append("  ");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (userguess == secretUpperWord)
+                            {
+                                EndGame(true);
+                                break;
                             }
                             else
                             {
                                 guessesLeft--;
-                                wrongLetters.Append(letterGuess).Append("  ");
                             }
-                        }
-                    }
-
-                    else
-                    {
-                        if (userguess == secretUpperWord)
-                        {
-                            EndGame(true);
-                            break;
-                        }
-                        else
-                        {
-                            guessesLeft--;
                         }
                     }
                     if (Array.IndexOf(secretLetters, '_') == -1)
@@ -103,8 +105,19 @@ namespace Hangman
             }
             Console.WriteLine("\n" + "\n");
             Console.WriteLine($"\tLetters not in the word: \n\t{wrongLetters}\n");
+        }
 
-            //!!Visa hängd gubbe??
+        static bool CheckIfLetter(string userguess)
+        {
+            bool isLetter = true;
+            foreach (char checkLetter in userguess)
+            {
+                if (!char.IsLetter(checkLetter))
+                {
+                    return false;
+                }
+            }
+            return isLetter;
         }
 
         static bool CheckDuplicate(char letterGuess, char[] secretLetters, StringBuilder wrongLetters)
@@ -140,20 +153,17 @@ namespace Hangman
 
         static void EndGame(bool checkVictory)
         {
-            Console.Clear();
             if (checkVictory == true)
             {
-                Console.WriteLine("You have won the game!");
+                Console.WriteLine("\n\tYou have won the game!");
             }
             else
             {
-                Console.WriteLine("You have lost the game!");
+                Console.WriteLine("\n\tYou have lost the game!");
             }
-            System.Threading.Thread.Sleep(2000);
+            System.Threading.Thread.Sleep(3000);
             string secretWord = GetSecretWord();
             GameScreen(10, secretWord);
-            //!!Ändra tid
-            //!! Visa vinst / förlust + rätt ord (Hängd gubbe?)
         }
     }
 }
