@@ -8,8 +8,7 @@ namespace Hangman
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("\n\tWelcome to Hangman!");
-            Console.WriteLine("\tYou have 10 chances to guess the word");
+            Console.WriteLine("\n\tWelcome to Hangman!\n\tYou have 10 chances to guess the word\n\tPress 1 to exit Hangman");
             string secretWord = GetSecretWord();
             System.Threading.Thread.Sleep(3000);
             GameScreen(10, secretWord);
@@ -70,7 +69,7 @@ namespace Hangman
                         {
                             if (userguess == secretUpperWord)
                             {
-                                EndGame(true);
+                                EndGame(true, secretWord);
                                 break;
                             }
                             else
@@ -81,7 +80,7 @@ namespace Hangman
                     }
                     if (Array.IndexOf(secretLetters, '_') == -1)
                     {
-                        EndGame(true);
+                        EndGame(true, secretWord);
                         break;
                     }
                 }
@@ -90,25 +89,26 @@ namespace Hangman
                     Console.WriteLine("An exception has occurred, you maybe tried to input numbers or symbols instead of letters");
                 }
             }
-            EndGame(false);
+            EndGame(false, secretWord);
         }
 
         static void ShowUpdate(char[] secretLetters, StringBuilder wrongLetters,int guessesLeft)
         {
             Console.Clear();
-            Console.WriteLine($"\n\tYou have {guessesLeft} guesses left");
-            Console.WriteLine("\tGuess a letter in the word or the word itself");
-            Console.WriteLine();
+            Console.WriteLine($"\n\tYou have {guessesLeft} guesses left\n\tGuess a letter in the word or the word itself\n\n");
             for (int i = 0; i < secretLetters.Length; i++)
             {
                 Console.Write($"\t{secretLetters[i]}");
             }
-            Console.WriteLine("\n" + "\n");
-            Console.WriteLine($"\tLetters not in the word: \n\t{wrongLetters}\n");
+            Console.WriteLine($"\n\n\n\n\tLetters not in the word: \n\t{wrongLetters}\n");
         }
 
         static bool CheckIfLetter(string userguess)
         {
+            if (userguess == "1")
+            {
+                ExitGame();
+            }
             bool isLetter = true;
             foreach (char checkLetter in userguess)
             {
@@ -151,19 +151,37 @@ namespace Hangman
             }
         }
 
-        static void EndGame(bool checkVictory)
+        static void EndGame(bool checkVictory, string theWord)
         {
+            Console.Clear();
             if (checkVictory == true)
             {
-                Console.WriteLine("\n\tYou have won the game!");
+                Console.WriteLine($"\n\tYou have won the game!\n\n\tThe word was: {theWord}");
             }
             else
             {
-                Console.WriteLine("\n\tYou have lost the game!");
+                Console.WriteLine($"\n\tYou have lost the game!\n\n\tThe word was: {theWord}");
             }
-            System.Threading.Thread.Sleep(3000);
-            string secretWord = GetSecretWord();
-            GameScreen(10, secretWord);
+            System.Threading.Thread.Sleep(2000);
+
+            Console.WriteLine("\n\tPress 1 to exit Hangman or press another key to play again");
+            if(Console.ReadLine() == "1")
+            {
+                ExitGame();
+            }
+            else
+            {
+                string secretWord = GetSecretWord();
+                GameScreen(10, secretWord);
+            }
+        }
+
+        static void ExitGame()
+        {
+            Console.Clear();
+            Console.WriteLine("\n\tExiting Hangman");
+            System.Threading.Thread.Sleep(1500);
+            Environment.Exit(0);
         }
     }
 }
