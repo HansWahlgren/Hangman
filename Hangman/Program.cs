@@ -16,12 +16,23 @@ namespace Hangman
 
         static string GetSecretWord()
         {
-        //    string wholeFile = System.IO.File.ReadAllText(@"C:\Users\deltagare\Desktop\Assignments\pw_2Hangman\Hangman\Hangman\FullWordList.txt");
-            string wholeFile = System.IO.File.ReadAllText(@"..\..\..\FullWordList.txt");
-            string[] wordList = wholeFile.Split(',');
-            Random random = new Random();
-            int randomNumber = random.Next(0, wordList.Length - 1);
-            return (wordList[randomNumber]);
+            try
+            {
+                //    string wholeFile = System.IO.File.ReadAllText(@"C:\Users\deltagare\Desktop\Assignments\pw_2Hangman\Hangman\Hangman\FullWordList.txt");
+                string wholeFile = System.IO.File.ReadAllText(@"..\..\..\FullWordList.txt");
+                string[] wordList = wholeFile.Split(',');
+                Random random = new Random();
+                int randomNumber = random.Next(0, wordList.Length - 1);
+                return (wordList[randomNumber]);
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("The wordlist could not be found");
+                System.Threading.Thread.Sleep(1500);
+                Environment.Exit(0);
+                return ("");
+            }
         }
 
         static void GameScreen(int guessesLeft, string secretWord)
