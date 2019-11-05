@@ -16,8 +16,8 @@ namespace Hangman
 
         static string GetSecretWord()
         {
-            string[] wordList = new string[] {"Sweden", "England", "Ireland", "Scottland", "China", "France",
-            "India", "Finland", "Norway" };
+            string wholeFile = System.IO.File.ReadAllText(@"C:\Users\deltagare\Desktop\Assignments\pw_2Hangman\FullWordList.txt");
+            string[] wordList = wholeFile.Split(',');
             Random random = new Random();
             int randomNumber = random.Next(0, wordList.Length - 1);
             return (wordList[randomNumber]);
